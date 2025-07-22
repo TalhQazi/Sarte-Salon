@@ -1,2 +1,2 @@
 # Sarte-Salon
-Solon in-house portal for employees  
+Salon in-house portal for employees  

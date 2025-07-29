@@ -1,34 +1,132 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
+const express = require('express');
+const mongoose = require('mongoose');
+const Service = require('./models/Service');
+const Product = require('./models/Product');
+const Deal = require('./models/deal');
 
-// Load env variables
-dotenv.config();
-
-// Create express app
 const app = express();
-
-// Middleware to parse JSON
 app.use(express.json());
 
-// Import Routes
-const adminAuthRoutes = require("./routes/adminauth");
-const serviceRoutes = require("./routes/serviceRoutes");
-const productRoutes = require("./routes/productroutes");
-
-// Use Routes
-app.use("/api/admin", adminAuthRoutes);
-app.use("/api/services", serviceRoutes);
-app.use("/api/products", productRoutes);
-
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
+// DB connect
+mongoose.connect('mongodb://127.0.0.1:27017/Sarte-Salon', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
-.then(() => console.log("MongoDB connected"))
-.catch((err) => console.error("MongoDB Error:", err));
+});
+app.get('/hello',(req, res ) =>{
+  res.send("Hello World i m testing !");
+} )
+// ----- SERVICES -----
+app.post('/service', async (req, res) => {
+  try {
+    const newService = new Service(req.body);
+    await newService.save();
+    res.status(201).json({ message: 'Service added', service: newService });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get('/service', async (req, res) => {
+  try {
+    const service = await Service.find();
+    res.json(service);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/service/:id', async (req, res) => {
+  try {
+    const updated = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: 'Service updated', service: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/service/:id', async (req, res) => {
+  try {
+    await Service.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Service deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----- PRODUCTS -----
+app.post('/product', async (req, res) => {
+  try {
+    const newProduct = new Product(req.body);
+    await newProduct.save();
+    res.status(201).json({ message: 'Product added', product: newProduct });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/product', async (req, res) => {
+  try {
+    const product = await Product.find();
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/product/:id', async (req, res) => {
+  try {
+    const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: 'Product updated', product: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/products/:id', async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Product deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ----- DEALS -----
+app.post('/deals', async (req, res) => {
+  try {
+    const newDeal = new Deal(req.body);
+    await newDeal.save();
+    res.status(201).json({ message: 'Deal added', deal: newDeal });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/deals', async (req, res) => {
+  try {
+    const deals = await Deal.find();
+    res.json(deals);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/deals/:id', async (req, res) => {
+  try {
+    const updated = await Deal.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ message: 'Deal updated', deal: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/deals/:id', async (req, res) => {
+  try {
+    await Deal.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deal deleted' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.listen(3000, () => console.log('✅ Server running at http://localhost:3000'));
